@@ -84,3 +84,75 @@
 (defn encrypt [message rails]
   (combine "" message rails 1)
 )
+(def decryptable "Uhoem_el_hrmlte")
+
+(defn cycleCount [message rails]
+  (int (/ (count message) (getCycle rails)))
+)
+
+(defn incomplete [message rails]
+  (mod (count message) (getCycle rails)))
+
+(defn railLength [message rails row]
+  (cond
+    (= row 0)
+      0
+    (= row 1)
+      (cond
+        (> (incomplete message rails) row)
+          (+ (cycleCount message rails) 1)
+        (<= (incomplete message rails) row)
+          (cycleCount message rails)
+      )
+    (= row rails)
+      (cond
+        (>= (incomplete message rails) row)
+          (+ (cycleCount message rails) 1)
+        (< (incomplete message rails) row)
+          (cycleCount message rails)
+      )
+    :else
+      (cond
+        (>= (incomplete message rails) row)
+          (+ (* (cycleCount message rails) 2) 1)
+        (< (incomplete message rails) row)
+          (* (cycleCount message rails) 2)
+      )
+  )
+)
+
+(defn extendedRailLength [message rails row]
+  (cond
+    (= row 0)
+      0
+    (= row 1)
+      (cond
+        (> (incomplete message rails) row)
+          (+ (cycleCount message rails) 1)
+        (<= (incomplete message rails) row)
+          (cycleCount message rails)
+      )
+    (= row rails)
+      (cond
+        (>= (incomplete message rails) row)
+          (+ (+ (cycleCount message rails) 1) (extendedRailLength message rails (- row 1)))
+        (< (incomplete message rails) row)
+          (+ (cycleCount message rails) (extendedRailLength message rails (- row 1)))
+      )
+    :else
+      (cond
+        (>= (incomplete message rails) row)
+          (+ (+ (* (cycleCount message rails) 2) 1) (extendedRailLength message rails (- row 1)))
+        (< (incomplete message rails) row)
+          (+ (* (cycleCount message rails) 2) (extendedRailLength message rails (- row 1)))
+      )
+  )
+)
+
+(defn railContent [message rails row]
+  (subs message
+    (extendedRailLength message rails (- row 1))
+    (+ 
+      (extendedRailLength message rails (- row 1))
+      (railLength message rails row)))
+)
