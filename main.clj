@@ -213,12 +213,12 @@
             :else
               result
           )
-          "down"
+          direction
           (+ step 1)
         )
         (if (= row rails)
           (cond
-            (= (mod (count result) 3) 2)
+            (= (mod step 3) 2)
               (concatenate
                 message
                 rails
@@ -282,24 +282,47 @@
       )
     (= direction "up")
       (if (= row 1)
-        (concatenate 
-          message 
-          rails 
-          (+ row 1)
-          (cond
-            (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*")
-              (str result 
-                (subs 
-                  (flattenRail decryptable rails row 0) 
-                  (int (/ step 3)) 
-                  (+ (int (/ step 3)) 1)
-                )
-              )
-            :else
-              result
-          ) 
-          "down"
-          (+ step 1)
+        (cond
+          (= (mod step 3) 2)
+            (concatenate 
+              message 
+              rails 
+              row
+              (cond
+                (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*")
+                  (str result 
+                    (subs 
+                      (flattenRail decryptable rails row 0) 
+                      (int (/ step 3)) 
+                      (+ (int (/ step 3)) 1)
+                    )
+                  )
+                :else
+                  result
+              ) 
+              "down"
+              (+ step 1)
+            )
+          :else
+            (concatenate 
+              message 
+              rails 
+              (+ row 1)
+              (cond
+                (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*")
+                  (str result 
+                    (subs 
+                      (flattenRail decryptable rails row 0) 
+                      (int (/ step 3)) 
+                      (+ (int (/ step 3)) 1)
+                    )
+                  )
+                :else
+                  result
+              ) 
+              "down"
+              (+ step 1)
+            )
         )
         (if (= row rails)
           (concatenate 
@@ -344,4 +367,8 @@
       )
     )
   )
+)
+
+(defn decrypt [message rails]
+(concatenate message rails 1 "" "down" 0)
 )
