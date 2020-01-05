@@ -191,7 +191,7 @@
   )
 )
 
-(defn concatenate [message rails row result direction]
+(defn concatenate [message rails row result direction step]
 (if (=(count message) (count result))
   result
   (cond
@@ -202,55 +202,81 @@
           rails 
           (+ row 1)
           (cond
-            (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+            (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*")
               (str result 
                 (subs 
                   (flattenRail message rails row 0)
-                  (int (/ (count result) 3)) 
-                  (+ (int (/ (count result) 3)) 1) 
+                  (int (/ step 3)) 
+                  (+ (int (/ step 3)) 1) 
                 )
               )
             :else
               result
           )
           "down"
+          (+ step 1)
         )
         (if (= row rails)
-          (concatenate 
-            message 
-            rails 
-            (- row 1)
-            (cond
-              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*") 
-                (str result  
-                  (subs 
-                    (flattenRail decryptable rails row 0)
-                    (int (/ (count result) 3)) 
-                    (+ (int (/ (count result) 3)) 1)
-                  )
+          (cond
+            (= (mod (count result) 3) 2)
+              (concatenate
+                message
+                rails
+                row
+                (cond
+                  (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*") 
+                    (str result  
+                      (subs 
+                        (flattenRail decryptable rails row 0)
+                        (int (/ step 3)) 
+                        (+ (int (/ step 3)) 1)
+                      )
+                    )
+                  :else
+                    result
                 )
-              :else
-                result
-            ) 
-            "up"
+                "up"
+                (+ step 1) 
+              )
+            :else
+              (concatenate 
+                message 
+                rails 
+                (- row 1)
+                (cond
+                  (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*") 
+                    (str result  
+                      (subs 
+                        (flattenRail decryptable rails row 0)
+                        (int (/ step 3)) 
+                        (+ (int (/ step 3)) 1)
+                      )
+                    )   
+                  :else
+                    result
+                ) 
+              "up"
+              (+ step 1)
+              )
           )
           (concatenate 
             message 
             rails 
             (+ row 1)
             (cond
-              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+              (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*")
                 (str result 
                   (subs 
                     (flattenRail decryptable rails row 0)
-                    (int (/ (count result) 3)) 
-                    (+ (int (/ (count result) 3)) 1)
+                    (int (/ step 3)) 
+                    (+ (int (/ step 3)) 1)
                   )
                 )
               :else
                 result
             )  
             direction
+            (+ step 1)
           )
         )
       )
@@ -261,18 +287,19 @@
           rails 
           (+ row 1)
           (cond
-            (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+            (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*")
               (str result 
                 (subs 
                   (flattenRail decryptable rails row 0) 
-                  (int (/ (count result) 3)) 
-                  (+ (int (/ (count result) 3)) 1)
+                  (int (/ step 3)) 
+                  (+ (int (/ step 3)) 1)
                 )
               )
             :else
               result
           ) 
           "down"
+          (+ step 1)
         )
         (if (= row rails)
           (concatenate 
@@ -280,39 +307,41 @@
             rails 
             (- row 1)
             (cond
-              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*") 
+              (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*") 
                 (str result 
                   (subs 
                     (flattenRail decryptable rails row 0) 
-                    (int (/ (count result) 3)) 
-                    (+ (int (/ (count result) 3)) 1)
+                    (int (/ step 3)) 
+                    (+ (int (/ step 3)) 1)
                   )
                 )
               :else
                 result
             ) 
             "up"
+            (+ step 1)
           )
           (concatenate 
             message 
             rails 
             (- row 1)
             (cond
-              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+              (not= (subs (flattenRail message rails row 0) (int (/ step 3)) (+ (int (/ step 3)) 1)) "*")
                 (str result 
                   (subs 
                     (flattenRail decryptable rails row 0) 
-                    (int (/ (count result) 3)) 
-                    (+ (int (/ (count result) 3)) 1)
+                    (int (/ step 3)) 
+                    (+ (int (/ step 3)) 1)
                   )
                 ) 
               :else
                 result
             )
             direction
+            (+ step 1)
           )
         )
       )
+    )
   )
-)
 )
