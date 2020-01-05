@@ -156,3 +156,163 @@
       (extendedRailLength message rails (- row 1))
       (railLength message rails row)))
 )
+
+(defn flattenRail [message rails row offset]
+  (cond
+    (= row 1)
+      (cond
+        (< offset (railLength message rails row))
+          (str 
+            (subs (railContent message rails row) offset (+ offset 1))
+            "*"
+          (flattenRail message rails row (+ offset 1))
+          )
+        (= offset (railLength message rails row))
+          nil
+      )
+    (= row rails)
+      (cond
+        (< offset (railLength message rails row))
+          (str 
+            (subs (railContent message rails row) offset (+ offset 1))
+            "*"
+            (flattenRail message rails row (+ offset 1))
+          )
+        (= offset (railLength message rails row))
+          nil
+      )
+    :else
+      (cond 
+        (<= (* (railLength decryptable rails 1) 2) (railLength decryptable rails row))
+          (railContent message rails row)
+        :else
+          (str (railContent message rails row) "*")
+      )
+  )
+)
+
+(defn concatenate [message rails row result direction]
+(if (=(count message) (count result))
+  result
+  (cond
+    (= direction "down")
+      (if (= row 1)
+        (concatenate 
+          message 
+          rails 
+          (+ row 1)
+          (cond
+            (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+              (str result 
+                (subs 
+                  (flattenRail message rails row 0)
+                  (int (/ (count result) 3)) 
+                  (+ (int (/ (count result) 3)) 1) 
+                )
+              )
+            :else
+              result
+          )
+          "down"
+        )
+        (if (= row rails)
+          (concatenate 
+            message 
+            rails 
+            (- row 1)
+            (cond
+              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*") 
+                (str result  
+                  (subs 
+                    (flattenRail decryptable rails row 0)
+                    (int (/ (count result) 3)) 
+                    (+ (int (/ (count result) 3)) 1)
+                  )
+                )
+              :else
+                result
+            ) 
+            "up"
+          )
+          (concatenate 
+            message 
+            rails 
+            (+ row 1)
+            (cond
+              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+                (str result 
+                  (subs 
+                    (flattenRail decryptable rails row 0)
+                    (int (/ (count result) 3)) 
+                    (+ (int (/ (count result) 3)) 1)
+                  )
+                )
+              :else
+                result
+            )  
+            direction
+          )
+        )
+      )
+    (= direction "up")
+      (if (= row 1)
+        (concatenate 
+          message 
+          rails 
+          (+ row 1)
+          (cond
+            (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+              (str result 
+                (subs 
+                  (flattenRail decryptable rails row 0) 
+                  (int (/ (count result) 3)) 
+                  (+ (int (/ (count result) 3)) 1)
+                )
+              )
+            :else
+              result
+          ) 
+          "down"
+        )
+        (if (= row rails)
+          (concatenate 
+            message 
+            rails 
+            (- row 1)
+            (cond
+              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*") 
+                (str result 
+                  (subs 
+                    (flattenRail decryptable rails row 0) 
+                    (int (/ (count result) 3)) 
+                    (+ (int (/ (count result) 3)) 1)
+                  )
+                )
+              :else
+                result
+            ) 
+            "up"
+          )
+          (concatenate 
+            message 
+            rails 
+            (- row 1)
+            (cond
+              (not= (subs (flattenRail message rails row 0) (int (/ (count result) 3)) (+ (int (/ (count result) 3)) 1)) "*")
+                (str result 
+                  (subs 
+                    (flattenRail decryptable rails row 0) 
+                    (int (/ (count result) 3)) 
+                    (+ (int (/ (count result) 3)) 1)
+                  )
+                ) 
+              :else
+                result
+            )
+            direction
+          )
+        )
+      )
+  )
+)
+)
