@@ -99,9 +99,9 @@
       0
     (= row 1)
       (cond
-        (> (incomplete message rails) row)
+        (>= (incomplete message rails) row)
           (+ (cycleCount message rails) 1)
-        (<= (incomplete message rails) row)
+        (< (incomplete message rails) row)
           (cycleCount message rails)
       )
     (= row rails)
@@ -127,9 +127,9 @@
       0
     (= row 1)
       (cond
-        (> (incomplete message rails) row)
+        (>= (incomplete message rails) row)
           (+ (cycleCount message rails) 1)
-        (<= (incomplete message rails) row)
+        (< (incomplete message rails) row)
           (cycleCount message rails)
       )
     (= row rails)
