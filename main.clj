@@ -15,10 +15,12 @@
 (defn rail [collected remainder message rails row shift]
   (if (not= row 1);;if the row isnt the first
     (if (= (count remainder) (count message));;manipulate the string so that the first letter of the rail is in the first position
+      (try
       (rail 
         "" 
         (subs remainder (- row 1)) 
         message rails row "no")
+      (catch StringIndexOutOfBoundsException e (str "")))
       (if (= rails row);;if the row is the last
         (cond
           (>= (count remainder) (+ (getCycle rails) 1));;check for whether there are any more letters to get
@@ -32,23 +34,30 @@
             collected
         )
         (cond;;if the row is one of the middle rows
-          (>= (count remainder) (/ (+ (getCycle rails) 1) 2));;check for whether there are any more letters to get whilst paying attention that middle rows have more letters than side rows
+          (= shift "no")
             (cond
-              (= shift "no");;the shift variable is used to determine which gap size is present at the given moment, as sometimes the middle rows will have cycling gap sizes
+              (> (count remainder) (- (* (- rails 1) 2) (* (- row 1) 2)))
                 (rail
                   (str collected (subs remainder 0 1))
                   (subs remainder (- (* (- rails 1) 2) (* (- row 1) 2))) message rails row "yes")
-              (= shift "yes")
+              (> (count remainder) 0)
+                (str collected (subs remainder 0 1))
+              :else
+                collected
+            )
+          (= shift "yes")
+            (cond
+              (> (count remainder) (* (- row 1) 2))
                 (rail
                   (str collected (subs remainder 0 1))
                   (subs remainder (* (- row 1) 2)) message rails row "no")
+              (> (count remainder) 0)
+                (str collected (subs remainder 0 1))
+              :else
+                collected
             )
-          (> (count remainder) 0);;acquire the last letter in certain scenarios
-            (str collected (subs remainder 0 1))
-          :else
-            collected
         )
-      )
+    )
     )
     (cond;;if the row is the first row
       (>= (count remainder) (+ (getCycle rails) 1))
